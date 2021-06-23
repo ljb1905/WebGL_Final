@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WebGL_Tutorial - 201620897</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="gl-matrix.js"></script>
+    <script type="text/javascript" src="script.js"></script>
+</head>
+
+<body onload="main()">
+    <header>
+        <h1>WebGL Tuturial</h1>
+        <h4>우리는 이 WebGL_Tutorial 페이지를 통해 2D 도형과 3D 도형의 표현, 그리고 도형의 변환을 배울 예정이다.</h4>
+        <button onclick="loadPage(1)">Primitives와 Transformation</button>
+        <button onclick="loadPage(2)">3D 도형의 표현과 회전</button>
+        <hr>
+    </header>
+    <div id="Page1">
+        <h3>Primitives와 Transformation</h3>
+        <h4>WebGL에선 point, line, triangle로 모든 도형을 표현해야 한다. 이를 primitives라고 하고 "gl.drawArrays"함수나 "gl.drawElements"함수를 통해 그릴 수 있다.</h4>
+        <h4>우리는 여기서 drawArrays함수와 drawElements함수의 mode 변화에 따른 도형의 모습과 translate, scale 연산 결과를 확인해볼 수 있다.<br>캔버스를 클릭하여 좌표를 추가하고 translate, scale연산을 실행해보자!</h4>
+        <hr>
+        translate : </br>
+        x축 : 
+        <input style="width:300px" id="trx_range" type="range" min="-600" max="600" value="0" oninput="trx_update(this.value);">
+        y축 : 
+        <input style="width:300px" id="try_range" type="range" min="-600" max="600" value="0" oninput="try_update(this.value);">
+        </br>
+        <hr>
+        scale : </br>
+        <input style="width:300px" id="sca_range" type="range" min="0.0" max="3.0" value="1.0" step="0.1" oninput="sca_update(this.value);"></br>
+        <hr>
+        <label>mode 선택 : 
+            <select id="modeSelect">
+                <option value ="0">point</option>
+                <option value ="1">lines</option>
+                <option value ="3">lineStrip</option>
+                <option value ="2">lineLoop</option>
+                <option value ="4">triangles</option>
+                <option value ="5">triangleStrip</option>
+                <option value ="6">triangleFan</option>
+            </select>
+        </label>
+        <button onclick="clearVertex()">Canvas Clear!</button></br><hr>
+        <canvas id="mycanvas" style="border: none;" width="600" height="600"></canvas>
+        <hr>
+        <h3>Mode</h3>
+        mode를 통해 point, line, triangle을 어떤 식으로 그릴지 선택할 수 있다.<br>
+        <img src="images/line.png"><br>
+        <img src="images/triangle.png"><br>
+        <hr>      
+
+        <h3>Translate</h3>
+        <h4>이러한 translate, rotate, scale과 같은 transformation은 Homogeneous coordinate를 활용해 행렬의 곱으로 표현할 수 있다.</h4>
+        좌표를 x축으로 tx만큼, y축으로 ty만큼, z축으로 tz만큼 이동시키는 transformation 행렬은 다음과 같다.<br>
+        <img src="images/translate.png"><br>
+        이때, transformation 행렬은 column major order를 따라야 하기 때문에 다음과 같이 사용해야한다.<br>
+        <img src="images/translate2.png"><br>
+        <br>
+        <h3>Scale</h3>
+        각 축을 확대하거나 축소시키는 scale 행렬은 다음과 같다.<br>
+        <img src="images/scale.png"><br>
+        이때도 마찬가지로 column major order를 따라 다음과 같이 사용해야한다.<br>
+        <img src="images/scale2.png"><br>
+        <br>
+        <h3>Rotate</h3>
+        z축을 기준으로 rotate 하는 행렬은 다음과 같다.<br>
+        (2D 도형에서의 회전은 z축을 잡고 시계 반대 방향으로 돌린 것과 같기 때문에 z축을 기준으로 회전시켜야한다.)<br>
+        <img src="images/rotate.png"><br>
+        Math.을 활용하여 sin과 cos을 계산하여 다음과 같이 사용할 수 있다.<br>
+        <img src="images/rotate2.png"><br>
+        <hr>
+        <h4 style="color: crimson;">이처럼 Homogeneous coordinate를 활용함으로써 transformation이 곱셈 한번으로 처리되는 것을 확인 할 수 있다.<br>
+        이를 활용해 transformation 행렬을 미리 계산해둔다면 많은 vertex가 입력으로 들어와도 적은 계산으로 처리할 수 있다.</h4>
+        <h4>rotate에 대해선 3D도형의 표현과 변환에서 확인할 수 있다.</h4>
+    </div>
+    <div id="Page2" hidden>
+        <h3>3D 도형의 표현과 회전</h3>
+        <h4>우리는 Primitives와 Transformation 페이지에서 배운 내용으로 3D 도형을 표현하고, 회전시킬 수 있다.</h4>
+        <label>mode 선택 : 
+            <select id="modeSelect2">
+                <option value ="0">point</option>
+                <option value ="1">lines</option>
+                <option value ="3">lineStrip</option>
+                <option value ="2">lineLoop</option>
+                <option value ="4">triangles</option>
+                <option value ="5">triangleStrip</option>
+                <option value ="6">triangleFan</option>
+            </select>
+        </label>
+        <br><br>
+        <canvas id="mycanvas2" style="border: none;" width="600" height="600"></canvas>
+        <p>위의 정육면체를 마우스 드래그를 통해 회전 시킬 수 있습니다.</p>
+        <hr>
+        이 코드는 1개의 vertex에 x,y,z,r,g,b,a의 총 7가지의 Attribute를 가지고 있다.<br>
+        이러한 vertex가 총 36개가 만들어져(삼각형을 그린다면 12개의 삼각형, 한 면당 두개의 삼각형 사용) 정육면체를 이루게 된다.<br>
+        앞에서 배운 rotate 행렬의 곱셈을 통해 X축 회전과 Y축 회전을 통해 이를 구현할 수 있다.<br>
+        <img src="images/rotate3.png"><br>
+        위의 두 행렬의 곱셈 결과를 미리 계산해두면 많은 vertex가 입력으로 들어와도 계산량이 적어진다.
+
+    </div>
+</body>
+</html>
